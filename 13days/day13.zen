@@ -1,0 +1,28 @@
+import ti.*
+
+float f1
+
+void print_f1() {
+    setPenCol(0)
+    print(f1)
+    getKey()
+}
+
+int main() {
+    float start = 1.5234523452345
+    f1 = start
+    useLargeFont()
+    print_f1()
+    float f2 = 3
+    f1 *= f2
+    print_f1()
+    f2 = 1.0
+    f1 += f2
+    print_f1()
+    f2 = 2
+    f1 -= f2
+    print_f1()
+    f2 = 4.23
+    f1 /= f2
+    print_f1()
+}

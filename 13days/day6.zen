@@ -1,0 +1,12 @@
+import ti.*
+
+int main() {
+    clrLCDFull()
+    byte result = 5
+    for i in 1 to 200 {
+        result++
+    }
+    print(result)
+    getKey()
+    clrLCDFull()
+}

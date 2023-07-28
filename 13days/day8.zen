@@ -1,0 +1,43 @@
+import ti.*
+
+byte[] player1 = [0, 0, 0, 0, 0]
+byte[] player2 = [3, 2, 1, 1, 2]
+byte[] player3 = [1, 2, 2, 2, 0]
+byte[] player4 = [3, 0, 2, 0, 1]
+
+byte* loadPlayer1() {
+    return player1
+}
+
+byte* loadPlayer2() {
+    return player2
+}
+
+void loadData(byte *data) {
+    byte a = *data
+    ++data
+    byte b = *data
+    ++data
+    byte c = *data
+    ++data
+    byte d = *data
+    ++data
+    byte e = *data
+}
+
+int main() {
+    byte a = 1
+    byte *data
+    if a == 1 {
+        data = loadPlayer1()
+    } else {
+        data = loadPlayer2()
+    }
+
+    clrLCDFull()
+    setCursor(3, 2)
+    print("Hello!")
+    getKey()
+    clrLCDFull()
+}
+

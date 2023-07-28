@@ -1,0 +1,8 @@
+import ti.*
+
+int main() {
+    clrLCDFull()
+    print(1 + 5)
+    getKey()
+    clrLCDFull()
+}

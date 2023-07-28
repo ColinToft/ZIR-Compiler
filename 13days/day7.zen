@@ -1,0 +1,25 @@
+import ti.*
+
+void displayValue(byte value) {
+    print(value)
+    getKey()
+}
+
+int main() {
+    clrLCDFull()
+    byte a = 27
+    if a == 27 {
+        displayValue(a) 
+    } 
+
+    a = 0
+    while a <= 30 {
+        a++
+    }
+
+    displayValue(a)
+
+    if a == 2 {
+        return 2
+    }
+}

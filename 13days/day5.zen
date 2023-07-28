@@ -1,0 +1,8 @@
+import ti.*
+
+int main() {
+    byte answer = 5 + 7
+    print(answer)
+    getKey()
+    clrLCDFull()
+}
