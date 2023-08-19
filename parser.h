@@ -34,27 +34,6 @@ class Parser {
     std::vector<ExpressionNode*> parseExpressionList();
     ExpressionNode* parseExpression();
 
-    template <typename NodeTypePtr>
-    std::vector<NodeTypePtr> parseList(NodeTypePtr (Parser::*parseFunc)(),
-                                       Token::Type delimiter,
-                                       Token::Type end) {
-        std::vector<NodeTypePtr> nodes;
-
-        while (tokens.at(index).type != end) {
-            nodes.push_back((this->*parseFunc)());
-            if (tokens.at(index).type == delimiter) {
-                index++;
-            } else if (tokens.at(index).type != end) {
-                throw std::runtime_error(
-                    "Unexpected token " + tokens.at(index).text + " at line " +
-                    std::to_string(tokens.at(index).line) + ", column " +
-                    std::to_string(tokens.at(index).col));
-            }
-        }
-
-        return nodes;
-    }
-
     void expect(Token::Type type);
 };
 

@@ -10,47 +10,48 @@
  * Abstract syntax tree for the Zen programming language compiler.
  */
 class ASTNode {
-   public:
+  public:
     ASTNode() {}
     virtual ~ASTNode() {}
     virtual void print(int indent) = 0;
 };
 
-
 class ZenType : public ASTNode {
-   public:
+  public:
     enum Kind { Int, Float, String, Bool, Void };
     ZenType(Kind kind) : kind(kind) {}
 
     void print(int indent) {
-        std::cout << "TypeNode(";
+        std::cout << "ZenType(";
         switch (kind) {
-            case Int:
-                std::cout << "Int";
-                break;
-            case Float:
-                std::cout << "Float";
-                break;
-            case String:
-                std::cout << "String";
-                break;
-            case Bool:
-                std::cout << "Bool";
-                break;
-            case Void:
-                std::cout << "Void";
-                break;
+        case Int:
+            std::cout << "Int";
+            break;
+        case Float:
+            std::cout << "Float";
+            break;
+        case String:
+            std::cout << "String";
+            break;
+        case Bool:
+            std::cout << "Bool";
+            break;
+        case Void:
+            std::cout << "Void";
+            break;
         }
         std::cout << ")" << std::endl;
     }
 
-   private:
+    Kind getKind() { return kind; }
+
+  private:
     Kind kind;
 };
 
 class ParamNode : public ASTNode {
-   public:
-    ParamNode(ZenType* type, std::string name) : type(type), name(name) {}
+  public:
+    ParamNode(ZenType *type, std::string name) : type(type), name(name) {}
     ~ParamNode() { delete type; }
     void print(int indent) {
         std::cout << "ParamNode(";
@@ -59,27 +60,27 @@ class ParamNode : public ASTNode {
         std::cout << ")" << std::endl;
     }
 
-   private:
-    ZenType* type;
+  private:
+    ZenType *type;
     std::string name;
 };
 
 class StatementNode : public ASTNode {
-   public:
+  public:
     StatementNode() {}
     virtual ~StatementNode() {}
     virtual void print(int indent) = 0;
 };
 
 class FunctionNode : public ASTNode {
-   public:
-    FunctionNode(ZenType* type,
-                 std::string name,
-                 std::vector<ParamNode*> params,
-                 std::vector<StatementNode*> statements)
-        : type(type), name(name), params(params), statements(statements) {}
+  public:
+    FunctionNode(ZenType *returnType, std::string name,
+                 std::vector<ParamNode *> params,
+                 std::vector<StatementNode *> statements)
+        : returnType(returnType), name(name), params(params),
+          statements(statements) {}
     ~FunctionNode() {
-        delete type;
+        delete returnType;
         for (auto node : statements) {
             delete node;
         }
@@ -105,26 +106,27 @@ class FunctionNode : public ASTNode {
     }
 
     std::string getName() { return name; }
-    std::vector<ParamNode*> getParams() { return params; }
-    std::vector<StatementNode*> getStatements() { return statements; }
+    ZenType *getReturnType() { return returnType; }
+    std::vector<ParamNode *> getParams() { return params; }
+    std::vector<StatementNode *> getStatements() { return statements; }
 
-   private:
-    ZenType* type;
+  private:
+    ZenType *returnType;
     std::string name;
-    std::vector<ParamNode*> params;
-    std::vector<StatementNode*> statements;
+    std::vector<ParamNode *> params;
+    std::vector<StatementNode *> statements;
 };
 
 class ExpressionNode : public StatementNode {
-   public:
+  public:
     ExpressionNode() {}
     virtual ~ExpressionNode() {}
     virtual void print(int indent) = 0;
 };
 
 class FunctionCallNode : public ExpressionNode {
-   public:
-    FunctionCallNode(std::string name, std::vector<ExpressionNode*> args)
+  public:
+    FunctionCallNode(std::string name, std::vector<ExpressionNode *> args)
         : name(name), args(args) {}
     ~FunctionCallNode() {
         for (auto node : args) {
@@ -144,29 +146,28 @@ class FunctionCallNode : public ExpressionNode {
     }
 
     std::string getName() { return name; }
-    std::vector<ExpressionNode*> getArgs() { return args; }
+    std::vector<ExpressionNode *> getArgs() { return args; }
 
-   private:
+  private:
     std::string name;
-    std::vector<ExpressionNode*> args;
+    std::vector<ExpressionNode *> args;
 };
 
 class VariableNode : public ExpressionNode {
-   public:
+  public:
     VariableNode(std::string name) : name(name) {}
     ~VariableNode() {}
     void print(int indent) {
         std::cout << "VariableNode(" << name << ")" << std::endl;
     }
 
-   private:
+  private:
     std::string name;
 };
 
 class ConstantNode : public ExpressionNode {
-   public:
-    ConstantNode(ZenType* type, std::string value)
-        : type(type), value(value) {}
+  public:
+    ConstantNode(ZenType *type, std::string value) : type(type), value(value) {}
     ~ConstantNode() {}
     void print(int indent) {
         std::string indentStr(indent, ' ');
@@ -176,14 +177,14 @@ class ConstantNode : public ExpressionNode {
     ZenType *getType() { return type; }
     std::string getValue() { return value; }
 
-   private:
-    ZenType* type;
+  private:
+    ZenType *type;
     std::string value;
 };
 
 class ProgramNode : public ASTNode {
-   public:
-    ProgramNode(std::vector<ASTNode*> nodes) : nodes(nodes) {}
+  public:
+    ProgramNode(std::vector<ASTNode *> nodes) : nodes(nodes) {}
     ~ProgramNode() {
         for (auto node : nodes) {
             delete node;
@@ -194,10 +195,10 @@ class ProgramNode : public ASTNode {
             node->print(0);
         }
     }
-    std::vector<FunctionNode*> getFunctions() {
-        std::vector<FunctionNode*> functions;
+    std::vector<FunctionNode *> getFunctions() {
+        std::vector<FunctionNode *> functions;
         for (auto node : nodes) {
-            FunctionNode* function = dynamic_cast<FunctionNode*>(node);
+            FunctionNode *function = dynamic_cast<FunctionNode *>(node);
             if (function != nullptr) {
                 functions.push_back(function);
             }
@@ -205,8 +206,8 @@ class ProgramNode : public ASTNode {
         return functions;
     }
 
-   private:
-    std::vector<ASTNode*> nodes;
+  private:
+    std::vector<ASTNode *> nodes;
 };
 
-#endif  // __AST_H
+#endif // __AST_H

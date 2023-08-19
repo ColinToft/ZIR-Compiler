@@ -10,44 +10,45 @@
 class BasicBlock;
 
 class Instruction {
-   public:
+  public:
     Instruction() {}
     virtual ~Instruction() {}
-    virtual void print() = 0;
+    virtual void print(std::ostream &out) = 0;
 };
 
 class FunctionCall : public Instruction {
-   public:
-    FunctionCall(std::string name, std::vector<Value*> arguments) : name(name), arguments(arguments) {}
+  public:
+    FunctionCall(std::string name, std::vector<Value *> arguments)
+        : name(name), arguments(arguments) {}
 
-    void print();
+    void print(std::ostream &out);
 
-   private:
+  private:
     std::string name;
-    std::vector<Value*> arguments;
+    std::vector<Value *> arguments;
 };
 
 class Branch : public Instruction {
-   public:
-    Branch(Value* condition, BasicBlock* trueBlock, BasicBlock* falseBlock)
+  public:
+    Branch(Value *condition, BasicBlock *trueBlock, BasicBlock *falseBlock)
         : condition(condition), trueBlock(trueBlock), falseBlock(falseBlock) {}
 
-    void print();
+    void print(std::ostream &out);
 
-   private:
-    Value* condition;
-    BasicBlock* trueBlock;
-    BasicBlock* falseBlock;
+  private:
+    Value *condition;
+    BasicBlock *trueBlock;
+    BasicBlock *falseBlock;
 };
 
 class Jump : public Instruction {
-   public:
-    Jump(BasicBlock* block) : block(block) {}
+  public:
+    Jump(BasicBlock *block) : block(block) {}
 
-    void print();
+    void print(std::ostream &out);
 
-   private:
-    BasicBlock* block;
+  private:
+    BasicBlock *block;
 };
 
-#endif  // __INSTRUCTION_H
+#endif // __INSTRUCTION_H

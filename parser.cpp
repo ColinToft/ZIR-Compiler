@@ -5,8 +5,8 @@
 
 #include "ast.h"
 
-ProgramNode* Parser::parse() {
-    std::vector<ASTNode*> nodes;
+ProgramNode *Parser::parse() {
+    std::vector<ASTNode *> nodes;
 
     while (index < tokens.size()) {
         // Check for function (type, identifier, (, ), {, })
@@ -29,7 +29,7 @@ ProgramNode* Parser::parse() {
     return new ProgramNode(nodes);
 }
 
-TypeNode* Parser::parseType() {
+ZenType *Parser::parseType() {
     Token type = tokens.at(index);
     index++;
     if (type.type != Token::Type::_Type) {
@@ -39,15 +39,15 @@ TypeNode* Parser::parseType() {
     }
 
     if (type.text == "int") {
-        return new TypeNode(TypeNode::Type::Int);
+        return new ZenType(ZenType::Kind::Int);
     } else if (type.text == "float") {
-        return new TypeNode(TypeNode::Type::Float);
+        return new ZenType(ZenType::Kind::Float);
     } else if (type.text == "string") {
-        return new TypeNode(TypeNode::Type::String);
+        return new ZenType(ZenType::Kind::String);
     } else if (type.text == "bool") {
-        return new TypeNode(TypeNode::Type::Bool);
+        return new ZenType(ZenType::Kind::Bool);
     } else if (type.text == "void") {
-        return new TypeNode(TypeNode::Type::Void);
+        return new ZenType(ZenType::Kind::Void);
     } else {
         throw std::runtime_error("Unexpected type " + type.text + " at line " +
                                  std::to_string(type.line) + ", column " +
@@ -55,20 +55,20 @@ TypeNode* Parser::parseType() {
     }
 }
 
-FunctionNode* Parser::parseFunction() {
+FunctionNode *Parser::parseFunction() {
     // Parse type
     Token type = tokens.at(index);
-    TypeNode* typeNode;
+    ZenType *Type;
     if (type.text == "int") {
-        typeNode = new TypeNode(TypeNode::Type::Int);
+        Type = new ZenType(ZenType::Kind::Int);
     } else if (type.text == "float") {
-        typeNode = new TypeNode(TypeNode::Type::Float);
+        Type = new ZenType(ZenType::Kind::Float);
     } else if (type.text == "string") {
-        typeNode = new TypeNode(TypeNode::Type::String);
+        Type = new ZenType(ZenType::Kind::String);
     } else if (type.text == "bool") {
-        typeNode = new TypeNode(TypeNode::Type::Bool);
+        Type = new ZenType(ZenType::Kind::Bool);
     } else if (type.text == "void") {
-        typeNode = new TypeNode(TypeNode::Type::Void);
+        Type = new ZenType(ZenType::Kind::Void);
     } else {
         throw std::runtime_error("Unexpected type " + type.text + " at line " +
                                  std::to_string(type.line) + ", column " +
@@ -81,34 +81,47 @@ FunctionNode* Parser::parseFunction() {
     index++;
 
     expect(Token::Type::LParen);
-    std::vector<ParamNode*> params = parseParams();
+    std::vector<ParamNode *> params = parseParams();
     expect(Token::Type::RParen);
 
     expect(Token::Type::LBrace);
-    std::vector<StatementNode*> body = parseStatements();
+    std::vector<StatementNode *> body = parseStatements();
     expect(Token::Type::RBrace);
 
-    return new FunctionNode(typeNode, identifier.text, params, body);
+    return new FunctionNode(Type, identifier.text, params, body);
 }
 
-std::vector<ParamNode*> Parser::parseParams() {
-    return parseList<ParamNode*>(parseParam, Token::Type::Comma,
-                                 Token::Type::RParen);
+std::vector<ParamNode *> Parser::parseParams() {
+    std::vector<ParamNode *> nodes;
+
+    while (tokens.at(index).type != Token::Type::RParen) {
+        nodes.push_back(parseParam());
+        if (tokens.at(index).type == Token::Type::Comma) {
+            index++;
+        } else if (tokens.at(index).type != Token::Type::RParen) {
+            throw std::runtime_error(
+                "Unexpected token " + tokens.at(index).text + " at line " +
+                std::to_string(tokens.at(index).line) + ", column " +
+                std::to_string(tokens.at(index).col));
+        }
+    }
+
+    return nodes;
 }
 
-ParamNode* Parser::parseParam() {
+ParamNode *Parser::parseParam() {
     // Parse type
-    TypeNode* typeNode = parseType();
+    ZenType *ZenType = parseType();
 
     // Parse identifier
     Token identifier = tokens.at(index);
     index++;
 
-    return new ParamNode(typeNode, identifier.text);
+    return new ParamNode(ZenType, identifier.text);
 }
 
-std::vector<StatementNode*> Parser::parseStatements() {
-    std::vector<StatementNode*> statements;
+std::vector<StatementNode *> Parser::parseStatements() {
+    std::vector<StatementNode *> statements;
     while (tokens.at(index).type != Token::Type::RBrace) {
         statements.push_back(parseStatement());
     }
@@ -116,7 +129,7 @@ std::vector<StatementNode*> Parser::parseStatements() {
     return statements;
 }
 
-StatementNode* Parser::parseStatement() {
+StatementNode *Parser::parseStatement() {
     while (tokens.at(index).type == Token::Type::Newline) {
         index++;
     }
@@ -128,7 +141,7 @@ StatementNode* Parser::parseStatement() {
     // Check for function call
     if (tokens.at(index).type == Token::Type::LParen) {
         index--;
-        FunctionCallNode* functionCall = parseFunctionCall();
+        FunctionCallNode *functionCall = parseFunctionCall();
         expect(Token::Type::Newline);
         return functionCall;
     }
@@ -139,30 +152,43 @@ StatementNode* Parser::parseStatement() {
         std::to_string(tokens.at(index).col));
 }
 
-FunctionCallNode* Parser::parseFunctionCall() {
+FunctionCallNode *Parser::parseFunctionCall() {
     // Parse identifier
     Token identifier = tokens.at(index);
     index++;
 
     expect(Token::Type::LParen);
-    std::vector<ExpressionNode*> args = parseExpressionList();
+    std::vector<ExpressionNode *> args = parseExpressionList();
     expect(Token::Type::RParen);
 
     return new FunctionCallNode(identifier.text, args);
 }
 
-std::vector<ExpressionNode*> Parser::parseExpressionList() {
-    return parseList<ExpressionNode*>(parseExpression, Token::Type::Comma,
-                                      Token::Type::RParen);
+std::vector<ExpressionNode *> Parser::parseExpressionList() {
+    std::vector<ExpressionNode *> nodes;
+
+    while (tokens.at(index).type != Token::Type::RParen) {
+        nodes.push_back(parseExpression());
+        if (tokens.at(index).type == Token::Type::Comma) {
+            index++;
+        } else if (tokens.at(index).type != Token::Type::RParen) {
+            throw std::runtime_error(
+                "Unexpected token " + tokens.at(index).text + " at line " +
+                std::to_string(tokens.at(index).line) + ", column " +
+                std::to_string(tokens.at(index).col));
+        }
+    }
+
+    return nodes;
 }
 
-ExpressionNode* Parser::parseExpression() {
+ExpressionNode *Parser::parseExpression() {
     // Is current token a number
     if (tokens.at(index).type == Token::Type::Number) {
         Token number = tokens.at(index);
         index++;
 
-        return new ConstantNode(new TypeNode(TypeNode::Int), number.text);
+        return new ConstantNode(new ZenType(ZenType::Int), number.text);
     }
 
     throw std::runtime_error(

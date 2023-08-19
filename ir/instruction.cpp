@@ -2,25 +2,28 @@
 #include "basicblock.h"
 
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
-void FunctionCall::print() {
-    std::cout << "call " << name << "(";
+void FunctionCall::print(std::ostream &out) {
+    out << "call @" << name << "(";
     for (auto argument : arguments) {
-        argument->print();
-        if (argument != arguments.back()) std::cout << ", ";
+        argument->print(out);
+        if (argument != arguments.back()) {
+            out << ", ";
+        }
     }
 
-    std::cout << ")" << std::endl;
+    out << ")" << std::endl;
 }
 
-void Branch::print() {
-    std::cout << "Branch {" << std::endl;
-    condition->print();
-    std::cout << std::string(1, '\t') << "True: ";
-    trueBlock->print();
-    std::cout << std::string(1, '\t') << "False: ";
-    falseBlock->print();
-    std::cout << "}" << std::endl;
+void Branch::print(std::ostream &out) {
+    out << "Branch {" << std::endl;
+    condition->print(out);
+    out << std::string(1, '\t') << "True: ";
+    trueBlock->print(out);
+    out << std::string(1, '\t') << "False: ";
+    falseBlock->print(out);
+    out << "}" << std::endl;
 }

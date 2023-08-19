@@ -21,6 +21,8 @@ class IRGenerator {
     private:
     void visitStatement(StatementNode* statement);
     void visitFunctionCall(FunctionCallNode* functionCall);
+    
+    ZIRType convertType(ZenType* type);
 
     BasicBlock *currentBB;
 };

@@ -12,22 +12,20 @@
  * Module for the ZIR intermediate representation.
  */
 class Module {
-   public:
+  public:
     Module(std::string name) : name(name) {}
 
-    void addFunction(Function* function) { functions.push_back(function); }
+    void addFunction(Function *function) { functions.push_back(function); }
 
-    void print(int indent) {
-        std::cout << "Module(" << name << ") {" << std::endl;
+    void print(std::ostream &out) {
         for (auto function : functions) {
-            function->print(indent + 1);
+            function->print(out);
         }
-        std::cout << "}" << std::endl;
     }
 
-   private:
+  private:
     std::string name;
-    std::vector<Function*> functions;
+    std::vector<Function *> functions;
 };
 
-#endif  // __MODULE_H
+#endif // __MODULE_H

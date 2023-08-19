@@ -5,36 +5,38 @@
 #include <string>
 
 class ZIRType {
-   public:
+  public:
     enum Kind {
         Void,
-        Int,
+        Int8,
         Float,
         Bool,
         String,
     };
 
-    void print() {
+    ZIRType(Kind kind) : kind(kind) {}
+
+    void print(std::ostream &out) {
         switch (kind) {
-            case Void:
-                std::cout << "void";
-                break;
-            case Int:
-                std::cout << "int";
-                break;
-            case Float:
-                std::cout << "float";
-                break;
-            case Bool:
-                std::cout << "bool";
-                break;
-            case String:
-                std::cout << "string";
-                break;
+        case Void:
+            out << "void";
+            break;
+        case Int8:
+            out << "int8";
+            break;
+        case Float:
+            out << "float";
+            break;
+        case Bool:
+            out << "bool";
+            break;
+        case String:
+            out << "string";
+            break;
         }
     }
 
-    private:
+  private:
     Kind kind;
 };
 
@@ -43,25 +45,24 @@ class ZIRType {
  * Value for the ZIR intermediate representation.
  */
 class Value {
-   public:
+  public:
     virtual ~Value() {}
 
-    virtual void print() = 0;
+    virtual void print(std::ostream &out) = 0;
 };
 
 class Constant : public Value {
-   public:
+  public:
     Constant(ZIRType type, std::string value) : type(type), value(value) {}
 
-    void print() {
-        std::cout << "Constant(";
-        type.print();
-        std::cout << ")" << std::endl;
+    void print(std::ostream &out) {
+        type.print(out);
+        out << " " << value;
     }
 
-   private:
+  private:
     ZIRType type;
     std::string value;
 };
 
-#endif  // __VALUE_H
+#endif // __VALUE_H
