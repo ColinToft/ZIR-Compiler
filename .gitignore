@@ -1,2 +1,7 @@
 /.clangd
 /.vscode/
+/.clang-format
+/*.exe
+/*.zir
+/*.ilk
+/*.pdb
