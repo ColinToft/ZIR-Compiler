@@ -5,10 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "function.h"
+#include "ir/Function.h"
 
 /**
- * @brief
  * Module for the ZIR intermediate representation.
  */
 class Module {
@@ -22,6 +21,10 @@ class Module {
             function->print(out);
         }
     }
+
+    std::string getName() { return name; }
+
+    std::vector<Function *> getFunctions() { return functions; }
 
   private:
     std::string name;

@@ -5,12 +5,11 @@
 #include <string>
 
 /**
- * @brief
  * Argument parser for the Zen programming language compiler.
  */
 class ArgParser {
-   public:
-    ArgParser(int argc, char const* argv[]) : argc(argc), argv(argv) {
+  public:
+    ArgParser(int argc, char const *argv[]) : argc(argc), argv(argv) {
         if (argc < 2) {
             throw std::runtime_error("No input file specified.");
         }
@@ -33,11 +32,11 @@ class ArgParser {
 
     std::string filename() { return _filename; }
 
-   private:
+  private:
     int argc;
-    char const** argv;
+    char const **argv;
 
     std::string _filename;
 };
 
-#endif  // __ARGPARSER_H
+#endif // __ARGPARSER_H

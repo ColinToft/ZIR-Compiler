@@ -1,7 +1,11 @@
+/.cache/
 /.clangd
 /.vscode/
+/build/
+/bin/
 /.clang-format
 /*.exe
 /*.zir
 /*.ilk
 /*.pdb
+/*.z80

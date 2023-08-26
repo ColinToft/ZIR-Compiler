@@ -9,6 +9,7 @@ class ZIRType {
     enum Kind {
         Void,
         Int8,
+        Int16,
         Float,
         Bool,
         String,
@@ -24,6 +25,9 @@ class ZIRType {
         case Int8:
             out << "int8";
             break;
+        case Int16:
+            out << "int16";
+            break;
         case Float:
             out << "float";
             break;
@@ -36,32 +40,48 @@ class ZIRType {
         }
     }
 
+    bool operator==(const ZIRType &other) const { return kind == other.kind; }
+
+    bool operator!=(const ZIRType &other) const { return kind != other.kind; }
+
   private:
     Kind kind;
 };
 
 /**
- * @brief
  * Value for the ZIR intermediate representation.
  */
 class Value {
   public:
+    Value(ZIRType type) : type(type) {}
     virtual ~Value() {}
 
     virtual void print(std::ostream &out) = 0;
+
+    virtual bool isConstant() { return false; }
+
+    ZIRType getType() { return type; }
+
+  protected:
+    ZIRType type;
 };
 
 class Constant : public Value {
   public:
-    Constant(ZIRType type, std::string value) : type(type), value(value) {}
+    Constant(ZIRType type, std::string value) : Value(type), value(value) {}
 
-    void print(std::ostream &out) {
+    void print(std::ostream &out) override {
         type.print(out);
-        out << " " << value;
+        if (type != ZIRType::Void) {
+            out << " " << value;
+        }
     }
 
+    bool isConstant() override { return true; }
+
+    int getIntValue() { return std::stoi(value); }
+
   private:
-    ZIRType type;
     std::string value;
 };
 

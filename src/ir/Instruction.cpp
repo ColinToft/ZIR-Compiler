@@ -1,12 +1,11 @@
-#include "instruction.h"
-#include "basicblock.h"
+#include "ir/instruction.h"
+#include "ir/basicblock.h"
 
 #include <iostream>
-#include <ostream>
 #include <string>
 #include <vector>
 
-void FunctionCall::print(std::ostream &out) {
+void CallInstruction::print(std::ostream &out) {
     out << "call @" << name << "(";
     for (auto argument : arguments) {
         argument->print(out);
@@ -18,7 +17,7 @@ void FunctionCall::print(std::ostream &out) {
     out << ")" << std::endl;
 }
 
-void Branch::print(std::ostream &out) {
+void BranchInstruction::print(std::ostream &out) {
     out << "Branch {" << std::endl;
     condition->print(out);
     out << std::string(1, '\t') << "True: ";
@@ -26,4 +25,10 @@ void Branch::print(std::ostream &out) {
     out << std::string(1, '\t') << "False: ";
     falseBlock->print(out);
     out << "}" << std::endl;
+}
+
+void ReturnInstruction::print(std::ostream &out) {
+    out << "return ";
+    value->print(out);
+    out << std::endl;
 }

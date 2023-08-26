@@ -82,6 +82,14 @@ std::vector<Token> Lexer::tokenize() {
                 typeKeywords.end()) {
                 tokens.push_back(Token(Token::Type::_Type, id, line, startCol));
             } else {
+                // First, check if it is a keyword
+                auto it = keywords.find(id);
+                if (it != keywords.end()) {
+                    tokens.push_back(Token(it->second, id, line, startCol));
+                    continue;
+                }
+
+                // If not, it is an identifier
                 tokens.push_back(
                     Token(Token::Type::Identifier, id, line, startCol));
             }

@@ -2,26 +2,32 @@
 #define __LEXER_H
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 struct Token {
-    enum class Type {
+    enum Type {
         Number,
         Identifier,
         Plus,
         Minus,
         Mul,
         Div,
-        LParen,    // (
-        RParen,    // )
-        LBrace,    // {
-        RBrace,    // }
-        LBracket,  // [
-        RBracket,  // ]
+        LParen,   // (
+        RParen,   // )
+        LBrace,   // {
+        RBrace,   // }
+        LBracket, // [
+        RBracket, // ]
         Comma,
         Newline,
         Eof,
         _Type,
+        If,
+        Else,
+        While,
+        For,
+        Return,
     };
 
     Token(Type type, std::string text, int line, int col)
@@ -36,16 +42,15 @@ struct Token {
 };
 
 /**
- * @brief
  * Lexer for the Zen programming language.
  */
 class Lexer {
-   public:
+  public:
     Lexer(std::string text) : text(text), textSize(text.length()) {}
 
     std::vector<Token> tokenize();
 
-   private:
+  private:
     std::string text;
     int textSize;
     int pos = 0;
@@ -54,6 +59,14 @@ class Lexer {
 
     std::vector<std::string> typeKeywords = {"int", "float", "string", "bool",
                                              "void"};
+
+    // Keywords that are not types
+    std::unordered_map<std::string, Token::Type> keywords = {
+        {"if", Token::Type::If},
+        {"else", Token::Type::Else},
+        {"while", Token::Type::While},
+        {"for", Token::Type::For},
+        {"return", Token::Type::Return}};
 };
 
-#endif  // __LEXER_H
+#endif // __LEXER_H

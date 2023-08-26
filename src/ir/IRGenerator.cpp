@@ -1,4 +1,4 @@
-#include "irgenerator.h"
+#include "ir/irgenerator.h"
 
 Module *IRGenerator::generate(std::string name, ProgramNode *root) {
     Module *module = new Module(name);
@@ -22,6 +22,10 @@ Module *IRGenerator::generate(std::string name, ProgramNode *root) {
 void IRGenerator::visitStatement(StatementNode *statement) {
     if (auto functionCall = dynamic_cast<FunctionCallNode *>(statement)) {
         visitFunctionCall(functionCall);
+    } else if (auto returnStatement = dynamic_cast<ReturnNode *>(statement)) {
+        visitReturn(returnStatement);
+    } else {
+        throw std::runtime_error("Unknown statement reached in IR generator");
     }
 }
 
@@ -34,13 +38,22 @@ void IRGenerator::visitFunctionCall(FunctionCallNode *functionCall) {
         }
     }
 
-    currentBB->addInstruction(new FunctionCall(functionCall->getName(), args));
+    currentBB->addInstruction(
+        new CallInstruction(functionCall->getName(), args));
+}
+
+void IRGenerator::visitReturn(ReturnNode *returnNode) {
+    if (auto constant =
+            dynamic_cast<ConstantNode *>(returnNode->getExpression())) {
+        currentBB->addInstruction(new ReturnInstruction(new Constant(
+            convertType(constant->getType()), constant->getValue())));
+    }
 }
 
 ZIRType IRGenerator::convertType(ZenType *type) {
     switch (type->getKind()) {
-    case ZenType::Int:
-        return ZIRType(ZIRType::Int8);
+    case ZenType::Int16:
+        return ZIRType(ZIRType::Int16);
     case ZenType::Void:
         return ZIRType(ZIRType::Void);
     default:

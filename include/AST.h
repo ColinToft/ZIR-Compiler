@@ -6,7 +6,6 @@
 #include <vector>
 
 /**
- * @brief
  * Abstract syntax tree for the Zen programming language compiler.
  */
 class ASTNode {
@@ -18,14 +17,14 @@ class ASTNode {
 
 class ZenType : public ASTNode {
   public:
-    enum Kind { Int, Float, String, Bool, Void };
+    enum Kind { Int16, Float, String, Bool, Void };
     ZenType(Kind kind) : kind(kind) {}
 
     void print(int indent) {
         std::cout << "ZenType(";
         switch (kind) {
-        case Int:
-            std::cout << "Int";
+        case Int16:
+            std::cout << "Int16";
             break;
         case Float:
             std::cout << "Float";
@@ -180,6 +179,23 @@ class ConstantNode : public ExpressionNode {
   private:
     ZenType *type;
     std::string value;
+};
+
+class ReturnNode : public StatementNode {
+  public:
+    ReturnNode(ExpressionNode *expression) : expression(expression) {}
+    ~ReturnNode() { delete expression; }
+    void print(int indent) {
+        std::string indentStr(indent, ' ');
+        std::cout << indentStr << "ReturnNode(" << std::endl;
+        expression->print(indent + 1);
+        std::cout << indentStr << ")" << std::endl;
+    }
+
+    ExpressionNode *getExpression() { return expression; }
+
+  private:
+    ExpressionNode *expression;
 };
 
 class ProgramNode : public ASTNode {

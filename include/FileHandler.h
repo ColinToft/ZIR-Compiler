@@ -6,11 +6,10 @@
 #include <string>
 
 /**
- * @brief
  * File handler for the Zen programming language compiler.
  */
 class FileHandler {
-   public:
+  public:
     FileHandler() {}
 
     std::string readFile(std::string filename) {
@@ -32,4 +31,4 @@ class FileHandler {
     }
 };
 
-#endif  // __FILEHANDLER_H
+#endif // __FILEHANDLER_H

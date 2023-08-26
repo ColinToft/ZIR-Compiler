@@ -5,10 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "instruction.h"
+#include "ir/Instruction.h"
 
 /**
- * @brief
  * Basic block for the ZIR intermediate representation.
  */
 class BasicBlock {
@@ -28,6 +27,8 @@ class BasicBlock {
     }
 
     std::string getName() { return name; }
+
+    std::vector<Instruction *> &getInstructions() { return instructions; }
 
   private:
     std::string name;

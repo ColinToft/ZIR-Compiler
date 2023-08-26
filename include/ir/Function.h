@@ -2,14 +2,13 @@
 #define __FUNCTION_H
 
 #include <iostream>
-#include <ostream>
 #include <string>
 #include <vector>
 
-#include "basicblock.h"
+#include "ir/BasicBlock.h"
+#include "ir/Value.h"
 
 /**
- * @brief
  * Function for the ZIR intermediate representation.
  */
 class Function {
@@ -33,6 +32,8 @@ class Function {
     std::string getName() { return name; }
 
     BasicBlock *getEntryBlock() { return basicBlocks[0]; }
+
+    std::vector<BasicBlock *> &getBasicBlocks() { return basicBlocks; }
 
   private:
     std::string name;

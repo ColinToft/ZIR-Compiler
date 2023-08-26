@@ -3,7 +3,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "ast.h"
+#include "AST.h"
+#include "ParserException.h"
 
 ProgramNode *Parser::parse() {
     std::vector<ASTNode *> nodes;
@@ -19,10 +20,7 @@ ProgramNode *Parser::parse() {
         } else if (tokens.at(index).type == Token::Type::Eof) {
             break;
         } else {
-            throw std::runtime_error(
-                "Unexpected token " + tokens.at(index).text + " at line " +
-                std::to_string(tokens.at(index).line) + ", column " +
-                std::to_string(tokens.at(index).col));
+            throw UnexpectedTokenException(tokens.at(index));
         }
     }
 
@@ -39,7 +37,7 @@ ZenType *Parser::parseType() {
     }
 
     if (type.text == "int") {
-        return new ZenType(ZenType::Kind::Int);
+        return new ZenType(ZenType::Kind::Int16);
     } else if (type.text == "float") {
         return new ZenType(ZenType::Kind::Float);
     } else if (type.text == "string") {
@@ -49,9 +47,9 @@ ZenType *Parser::parseType() {
     } else if (type.text == "void") {
         return new ZenType(ZenType::Kind::Void);
     } else {
-        throw std::runtime_error("Unexpected type " + type.text + " at line " +
-                                 std::to_string(type.line) + ", column " +
-                                 std::to_string(type.col));
+        throw SyntaxException("Unexpected type " + type.text + " at line " +
+                              std::to_string(type.line) + ", column " +
+                              std::to_string(type.col));
     }
 }
 
@@ -60,7 +58,7 @@ FunctionNode *Parser::parseFunction() {
     Token type = tokens.at(index);
     ZenType *Type;
     if (type.text == "int") {
-        Type = new ZenType(ZenType::Kind::Int);
+        Type = new ZenType(ZenType::Kind::Int16);
     } else if (type.text == "float") {
         Type = new ZenType(ZenType::Kind::Float);
     } else if (type.text == "string") {
@@ -70,9 +68,9 @@ FunctionNode *Parser::parseFunction() {
     } else if (type.text == "void") {
         Type = new ZenType(ZenType::Kind::Void);
     } else {
-        throw std::runtime_error("Unexpected type " + type.text + " at line " +
-                                 std::to_string(type.line) + ", column " +
-                                 std::to_string(type.col));
+        throw SyntaxException("Unexpected type " + type.text + " at line " +
+                              std::to_string(type.line) + ", column " +
+                              std::to_string(type.col));
     }
     index++;
 
@@ -99,10 +97,7 @@ std::vector<ParamNode *> Parser::parseParams() {
         if (tokens.at(index).type == Token::Type::Comma) {
             index++;
         } else if (tokens.at(index).type != Token::Type::RParen) {
-            throw std::runtime_error(
-                "Unexpected token " + tokens.at(index).text + " at line " +
-                std::to_string(tokens.at(index).line) + ", column " +
-                std::to_string(tokens.at(index).col));
+            throw UnexpectedTokenException(tokens.at(index), "comma or )");
         }
     }
 
@@ -134,22 +129,30 @@ StatementNode *Parser::parseStatement() {
         index++;
     }
 
-    // Parse identifier
-    Token identifier = tokens.at(index);
-    index++;
+    // Check for return statement
+    if (tokens.at(index).type == Token::Type::Return) {
+        index++;
 
-    // Check for function call
-    if (tokens.at(index).type == Token::Type::LParen) {
-        index--;
+        // We either will have an expression or a newline
+        if (tokens.at(index).type == Token::Type::Newline) {
+            index++;
+            return new ReturnNode(
+                new ConstantNode(new ZenType(ZenType::Void), "void"));
+        }
+
+        ExpressionNode *expression = parseExpression();
+
+        expect(Token::Type::Newline);
+        return new ReturnNode(expression);
+    } else if (tokens.at(index).type == Token::Type::Identifier &&
+               tokens.at(index + 1).type == Token::Type::LParen) {
+        // Function call
         FunctionCallNode *functionCall = parseFunctionCall();
         expect(Token::Type::Newline);
         return functionCall;
     }
 
-    throw std::runtime_error(
-        "Unexpected token " + tokens.at(index).text + " at line " +
-        std::to_string(tokens.at(index).line) + ", column " +
-        std::to_string(tokens.at(index).col));
+    throw UnexpectedTokenException(tokens.at(index - 1), "statement");
 }
 
 FunctionCallNode *Parser::parseFunctionCall() {
@@ -172,10 +175,7 @@ std::vector<ExpressionNode *> Parser::parseExpressionList() {
         if (tokens.at(index).type == Token::Type::Comma) {
             index++;
         } else if (tokens.at(index).type != Token::Type::RParen) {
-            throw std::runtime_error(
-                "Unexpected token " + tokens.at(index).text + " at line " +
-                std::to_string(tokens.at(index).line) + ", column " +
-                std::to_string(tokens.at(index).col));
+            throw UnexpectedTokenException(tokens.at(index), "comma or )");
         }
     }
 
@@ -188,21 +188,15 @@ ExpressionNode *Parser::parseExpression() {
         Token number = tokens.at(index);
         index++;
 
-        return new ConstantNode(new ZenType(ZenType::Int), number.text);
+        return new ConstantNode(new ZenType(ZenType::Int16), number.text);
     }
 
-    throw std::runtime_error(
-        "Unexpected token " + tokens.at(index).text + " at line " +
-        std::to_string(tokens.at(index).line) + ", column " +
-        std::to_string(tokens.at(index).col));
+    throw UnexpectedTokenException(tokens.at(index));
 }
 
 void Parser::expect(Token::Type type) {
     if (tokens.at(index).type != type) {
-        throw std::runtime_error(
-            "Unexpected token " + tokens.at(index).text + " at line " +
-            std::to_string(tokens.at(index).line) + ", column " +
-            std::to_string(tokens.at(index).col));
+        throw UnexpectedTokenException(tokens.at(index));
     }
     index++;
 }
