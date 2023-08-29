@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 
+#include "backend/z80/Z80AsmPrinter.h"
+#include "backend/z80/Z80ISel.h"
 #include "backend/z80/Z80Instruction.h"
 #include "backend/z80/Z80Register.h"
 #include "ir/Value.h"

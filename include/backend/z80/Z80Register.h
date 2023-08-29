@@ -30,4 +30,9 @@ enum Z80Register {
  */
 std::string getRegisterName(Z80Register reg);
 
+/**
+ * Returns the size of the register in bytes.
+ */
+int getRegisterSize(Z80Register reg);
+
 #endif // __Z80REGISTER_H

@@ -8,7 +8,7 @@ void BCallInstruction::print(AsmPrinter *printer) {
 }
 
 void BCallInstruction::emit(AsmPrinter *printer,
-                            const SymbolTable &symbolTable) {
+                            const SymbolTable *symbolTable) {
     printer->emitByte(0xef);
     printer->emitWord(tiCallMap[label]);
 }

@@ -34,6 +34,8 @@ class MachineModule {
 
     Backend *getBackend() { return backend; }
 
+    std::string getName() { return module->getName(); }
+
     std::vector<MachineFunction *> getMachineFunctions() {
         return machineFunctions;
     }

@@ -12,7 +12,7 @@ class ASTNode {
   public:
     ASTNode() {}
     virtual ~ASTNode() {}
-    virtual void print(int indent) = 0;
+    virtual void print(std::ostream &out, int indent) = 0;
 };
 
 class ZenType : public ASTNode {
@@ -20,26 +20,26 @@ class ZenType : public ASTNode {
     enum Kind { Int16, Float, String, Bool, Void };
     ZenType(Kind kind) : kind(kind) {}
 
-    void print(int indent) {
-        std::cout << "ZenType(";
+    void print(std::ostream &out, int indent) {
+        out << "ZenType(";
         switch (kind) {
         case Int16:
-            std::cout << "Int16";
+            out << "Int16";
             break;
         case Float:
-            std::cout << "Float";
+            out << "Float";
             break;
         case String:
-            std::cout << "String";
+            out << "String";
             break;
         case Bool:
-            std::cout << "Bool";
+            out << "Bool";
             break;
         case Void:
-            std::cout << "Void";
+            out << "Void";
             break;
         }
-        std::cout << ")" << std::endl;
+        out << ")" << std::endl;
     }
 
     Kind getKind() { return kind; }
@@ -52,11 +52,11 @@ class ParamNode : public ASTNode {
   public:
     ParamNode(ZenType *type, std::string name) : type(type), name(name) {}
     ~ParamNode() { delete type; }
-    void print(int indent) {
-        std::cout << "ParamNode(";
-        type->print(0);
-        std::cout << ", " << name;
-        std::cout << ")" << std::endl;
+    void print(std::ostream &out, int indent) {
+        out << "ParamNode(";
+        type->print(out, 0);
+        out << ", " << name;
+        out << ")" << std::endl;
     }
 
   private:
@@ -68,7 +68,7 @@ class StatementNode : public ASTNode {
   public:
     StatementNode() {}
     virtual ~StatementNode() {}
-    virtual void print(int indent) = 0;
+    virtual void print(std::ostream &out, int indent) = 0;
 };
 
 class FunctionNode : public ASTNode {
@@ -84,24 +84,24 @@ class FunctionNode : public ASTNode {
             delete node;
         }
     }
-    void print(int indent) {
+    void print(std::ostream &out, int indent) {
         std::string indentStr(indent, ' ');
-        std::cout << indentStr << "FunctionNode(" << name << ", [";
+        out << indentStr << "FunctionNode(" << name << ", [";
         for (int i = 0; i < params.size(); i++) {
-            params[i]->print(0);
+            params[i]->print(out, 0);
             if (i < params.size() - 1) {
-                std::cout << ", ";
+                out << ", ";
             }
         }
-        std::cout << "], [\n";
+        out << "], [\n";
         for (int i = 0; i < statements.size(); i++) {
-            statements[i]->print(indent + 1);
+            statements[i]->print(out, indent + 1);
             if (i < statements.size() - 1) {
-                std::cout << ",\n";
+                out << ",\n";
             }
         }
 
-        std::cout << indentStr << "])" << std::endl;
+        out << indentStr << "])" << std::endl;
     }
 
     std::string getName() { return name; }
@@ -120,7 +120,7 @@ class ExpressionNode : public StatementNode {
   public:
     ExpressionNode() {}
     virtual ~ExpressionNode() {}
-    virtual void print(int indent) = 0;
+    virtual void print(std::ostream &out, int indent) = 0;
 };
 
 class FunctionCallNode : public ExpressionNode {
@@ -132,16 +132,16 @@ class FunctionCallNode : public ExpressionNode {
             delete node;
         }
     }
-    void print(int indent) {
+    void print(std::ostream &out, int indent) {
         std::string indentStr(indent, ' ');
-        std::cout << indentStr << "FunctionCallNode(" << name << ", [\n";
+        out << indentStr << "FunctionCallNode(" << name << ", [\n";
         for (int i = 0; i < args.size(); i++) {
-            args[i]->print(indent + 1);
+            args[i]->print(out, indent + 1);
             if (i < args.size() - 1) {
-                std::cout << ",\n";
+                out << ",\n";
             }
         }
-        std::cout << indentStr << "])" << std::endl;
+        out << indentStr << "])" << std::endl;
     }
 
     std::string getName() { return name; }
@@ -156,8 +156,8 @@ class VariableNode : public ExpressionNode {
   public:
     VariableNode(std::string name) : name(name) {}
     ~VariableNode() {}
-    void print(int indent) {
-        std::cout << "VariableNode(" << name << ")" << std::endl;
+    void print(std::ostream &out, int indent) {
+        out << "VariableNode(" << name << ")" << std::endl;
     }
 
   private:
@@ -168,9 +168,9 @@ class ConstantNode : public ExpressionNode {
   public:
     ConstantNode(ZenType *type, std::string value) : type(type), value(value) {}
     ~ConstantNode() {}
-    void print(int indent) {
+    void print(std::ostream &out, int indent) {
         std::string indentStr(indent, ' ');
-        std::cout << indentStr << "ConstantNode(" << value << ")" << std::endl;
+        out << indentStr << "ConstantNode(" << value << ")" << std::endl;
     }
 
     ZenType *getType() { return type; }
@@ -185,11 +185,11 @@ class ReturnNode : public StatementNode {
   public:
     ReturnNode(ExpressionNode *expression) : expression(expression) {}
     ~ReturnNode() { delete expression; }
-    void print(int indent) {
+    void print(std::ostream &out, int indent) {
         std::string indentStr(indent, ' ');
-        std::cout << indentStr << "ReturnNode(" << std::endl;
-        expression->print(indent + 1);
-        std::cout << indentStr << ")" << std::endl;
+        out << indentStr << "ReturnNode(" << std::endl;
+        expression->print(out, indent + 1);
+        out << indentStr << ")" << std::endl;
     }
 
     ExpressionNode *getExpression() { return expression; }
@@ -206,9 +206,9 @@ class ProgramNode : public ASTNode {
             delete node;
         }
     }
-    void print(int indent) {
+    void print(std::ostream &out, int indent) {
         for (auto node : nodes) {
-            node->print(0);
+            node->print(out, 0);
         }
     }
     std::vector<FunctionNode *> getFunctions() {

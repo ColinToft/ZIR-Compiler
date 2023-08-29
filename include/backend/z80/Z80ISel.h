@@ -4,9 +4,9 @@
 #include <iostream>
 #include <string>
 
+#include "Pass.h"
 #include "backend/MachineFunction.h"
-#include "backend/MachineFunctionPass.h"
-#include "backend/z80/Z80Backend.h"
+#include "backend/z80/Z80MemoryLocation.h"
 
 /**
  * Instruction selection for the Z80 assembly language.
@@ -16,7 +16,8 @@ class Z80ISel : public MachineFunctionPass {
     /**
      * Converts an IR module to Z80 assembly by selecting Z80 instructions.
      */
-    void runOnMachineFunction(MachineFunction *function) override;
+    void run(MachineFunction *function,
+             MachineFunctionAnalysisManager &MFAM) override;
 
   private:
     void processCallInstruction(CallInstruction *callInstruction,

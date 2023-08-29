@@ -3,10 +3,12 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "backend/AsmPrinter.h"
 #include "backend/MachineInstruction.h"
+#include "backend/SymbolTable.h"
 
+class AsmPrinter;
 class MachineFunction;
 
 /**
@@ -27,7 +29,11 @@ class MachineBasicBlock {
 
     void print(AsmPrinter *printer);
 
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable);
+
     std::string getName() { return name; }
+
+    std::string getLabelName();
 
     MachineFunction *getParent() { return parent; }
 

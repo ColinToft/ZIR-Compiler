@@ -6,9 +6,9 @@ void Z80CallInstruction::print(AsmPrinter *printer) {
 }
 
 void Z80CallInstruction::emit(AsmPrinter *printer,
-                              const SymbolTable &symbolTable) {
+                              const SymbolTable *symbolTable) {
     printer->emitByte(0xcd);
-    printer->emitWord(symbolTable.getSymbol(label));
+    printer->emitWord(symbolTable->getSymbol(label));
 }
 
 void Z80RetInstruction::print(AsmPrinter *printer) {
@@ -16,7 +16,7 @@ void Z80RetInstruction::print(AsmPrinter *printer) {
 }
 
 void Z80RetInstruction::emit(AsmPrinter *printer,
-                             const SymbolTable &symbolTable) {
+                             const SymbolTable *symbolTable) {
     printer->emitByte(0xc9);
 }
 
@@ -29,8 +29,17 @@ void Z80LdInstruction::print(AsmPrinter *printer) {
 }
 
 void Z80LdInstruction::emit(AsmPrinter *printer,
-                            const SymbolTable &symbolTable) {
-    throw new std::runtime_error("Not implemented");
+                            const SymbolTable *symbolTable) {
+    if (dest->isRegisterPair() && src->isImmediate()) {
+        Z80RegisterOperand *destReg = static_cast<Z80RegisterOperand *>(dest);
+        int regCode = destReg->getRegisterCode();
+        printer->emitByte((regCode << 4) | 0x01);
+
+        Z80ImmediateOperand *srcImm = static_cast<Z80ImmediateOperand *>(src);
+        printer->emitWord(srcImm->getValue());
+    } else {
+        throw std::runtime_error("Unsupported ld instruction");
+    }
 }
 
 void Z80DBInstruction::print(AsmPrinter *printer) {
@@ -38,6 +47,6 @@ void Z80DBInstruction::print(AsmPrinter *printer) {
 }
 
 void Z80DBInstruction::emit(AsmPrinter *printer,
-                            const SymbolTable &symbolTable) {
+                            const SymbolTable *symbolTable) {
     printer->emitByte(value);
 }

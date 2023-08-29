@@ -45,12 +45,8 @@ void Z80ISel::processReturnInstruction(ReturnInstruction *returnInstruction,
     }
 }
 
-void Z80ISel::runOnMachineFunction(MachineFunction *machineFunction) {
-    // Select MachineInstructions for this function.
-
-    std::cout << "Z80ISel::runOnMachineFunction: "
-              << machineFunction->getFunction()->getName() << std::endl;
-
+void Z80ISel::run(MachineFunction *machineFunction,
+                  MachineFunctionAnalysisManager &MFAM) {
     Function *function = machineFunction->getFunction();
 
     for (auto BB : function->getBasicBlocks()) {

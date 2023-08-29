@@ -4,45 +4,71 @@
 #include <fstream>
 #include <iostream>
 #include <ostream>
+#include <stdint.h>
 #include <string>
 
+#include "backend/SymbolTable.h"
+
+#include "AnalysisManager.h"
+#include "Pass.h"
+
 class MachineModule;
+
+// Are we emitting textual assembly or binary machine code?
+enum class AsmPrinterMode { TEXT, BINARY };
 
 /**
  * Prints a MachineModule in assembly language.
  * The AsmPrinter is attached to a specific output stream.
  */
-class AsmPrinter {
+class AsmPrinter : public MachineModulePass {
   public:
-    // Are we emitting textual assembly or binary machine code?
-    enum PrinterMode { TEXT, BINARY };
-
-    AsmPrinter(std::ostream &out, PrinterMode mode) : out(out), mode(mode) {}
+    AsmPrinter(std::ostream &out, AsmPrinterMode mode) : out(out), mode(mode) {}
 
     /**
      * Prints a MachineModule
      */
-    void emit(MachineModule *module);
+    void run(MachineModule *module,
+             MachineModuleAnalysisManager &MMAM) override;
 
     /**
      * Prints the program prologue.
      */
-    virtual void emitProgramPrologue() {}
+    virtual void emitProgramPrologue(MachineModule *module,
+                                     const SymbolTable *table) {}
 
-    void emitByte(uint8_t byte) const { out << byte; }
+    /**
+     * Prints the program epilogue.
+     */
+    virtual void emitProgramEpilogue(MachineModule *module,
+                                     const SymbolTable *table) {}
+
+    virtual void emitByte(uint8_t byte) const { out << byte; }
 
     void emitWord(uint16_t word) const {
         // Note: this is little endian.
-        out << (uint8_t)(word & 0xFF);
-        out << (uint8_t)((word >> 8) & 0xFF);
+        emitByte(word & 0xFF);
+        emitByte((word >> 8) & 0xFF);
     }
 
     void emitDword(uint32_t dword) const {
         // Note: this is little endian.
-        out << (uint8_t)(dword & 0xFF);
-        out << (uint8_t)((dword >> 8) & 0xFF);
-        out << (uint8_t)((dword >> 16) & 0xFF);
-        out << (uint8_t)((dword >> 24) & 0xFF);
+        emitByte(dword & 0xFF);
+        emitByte((dword >> 8) & 0xFF);
+        emitByte((dword >> 16) & 0xFF);
+        emitByte((dword >> 24) & 0xFF);
+    }
+
+    void emitBytes(std::string bytes, int length) const {
+        int fromString = bytes.length() < length ? bytes.length() : length;
+
+        for (int i = 0; i < fromString; i++) {
+            emitByte(bytes[i]);
+        }
+
+        for (int i = fromString; i < length; i++) {
+            emitByte(0x00);
+        }
     }
 
     void print(std::string text, bool indent = false) {
@@ -62,8 +88,10 @@ class AsmPrinter {
     void printLine() { out << std::endl; }
 
   protected:
-    PrinterMode mode;
+    AsmPrinterMode mode;
     std::ostream &out;
+
+    SymbolTable *symbolTable;
 };
 
 #endif // __ASM_PRINTER_H

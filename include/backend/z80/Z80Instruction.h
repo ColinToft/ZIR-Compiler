@@ -21,7 +21,7 @@ class Z80CallInstruction : public Z80Instruction {
 
     void print(AsmPrinter *printer) override;
 
-    void emit(AsmPrinter *printer, const SymbolTable &symbolTable) override;
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;
 
     int size() override { return 3; }
 
@@ -36,7 +36,7 @@ class Z80RetInstruction : public Z80Instruction {
   public:
     void print(AsmPrinter *printer) override;
 
-    void emit(AsmPrinter *printer, const SymbolTable &symbolTable) override;
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;
 
     int size() override { return 1; }
 };
@@ -51,9 +51,15 @@ class Z80LdInstruction : public Z80Instruction {
 
     void print(AsmPrinter *printer) override;
 
-    void emit(AsmPrinter *printer, const SymbolTable &symbolTable) override;
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;
 
-    int size() override { return 1; }
+    int size() override {
+        if (dest->isRegisterPair() && src->isImmediate()) {
+            return 3;
+        } else {
+            throw std::runtime_error("Unsupported ld instruction");
+        }
+    }
 
   private:
     Z80Operand *dest;
@@ -66,7 +72,7 @@ class Z80DBInstruction : public Z80Instruction {
 
     void print(AsmPrinter *printer) override;
 
-    void emit(AsmPrinter *printer, const SymbolTable &symbolTable) override;
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;
 
     int size() override { return 1; }
 

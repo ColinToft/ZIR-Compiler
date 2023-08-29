@@ -15,7 +15,7 @@ class MachineInstruction {
   public:
     virtual void print(AsmPrinter *printer) = 0;
 
-    virtual void emit(AsmPrinter *printer, const SymbolTable &symbolTable) = 0;
+    virtual void emit(AsmPrinter *printer, const SymbolTable *symbolTable) = 0;
 
     /**
      * Returns the size of the instruction in bytes.

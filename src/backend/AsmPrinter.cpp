@@ -2,16 +2,27 @@
 
 #include "backend/MachineFunction.h"
 #include "backend/MachineModule.h"
+#include "backend/SymbolTableAnalysis.h"
 
-void AsmPrinter::emit(MachineModule *module) {
+void AsmPrinter::run(MachineModule *module,
+                     MachineModuleAnalysisManager &MMAM) {
+    SymbolTable *table = MMAM.getAnalysis<SymbolTable>(module);
+
     // Program prologue
-    emitProgramPrologue();
+    emitProgramPrologue(module, table);
 
     for (auto machineFunction : module->getMachineFunctions()) {
-        for (auto machineBasicBlock :
+        for (MachineBasicBlock *machineBasicBlock :
              machineFunction->getMachineBasicBlocks()) {
-            machineBasicBlock->print(this);
-            printLine();
+            if (mode == AsmPrinterMode::TEXT) {
+                machineBasicBlock->print(this);
+                printLine();
+            } else {
+                machineBasicBlock->emit(this, table);
+            }
         }
     }
+
+    // Program epilogue
+    emitProgramEpilogue(module, table);
 }

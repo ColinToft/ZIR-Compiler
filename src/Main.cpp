@@ -1,16 +1,17 @@
+#include <fstream>
+#include <iostream>
+
 #include "ArgParser.h"
 #include "FileHandler.h"
 #include "Parser.h"
 #include "ParserException.h"
-#include "backend/AsmPrinter.h"
+#include "PassManager.h"
+
+#include "backend/BackendPassBuilder.h"
 #include "backend/MachineModule.h"
-#include "backend/MachinePassManager.h"
-#include "backend/z80/Z80AsmPrinter.h"
-#include "backend/z80/Z80ISel.h"
+#include "backend/z80/Z80Backend.h"
 #include "ir/IRGenerator.h"
 #include "ir/Module.h"
-#include <fstream>
-#include <iostream>
 
 int main(int argc, char const *argv[]) {
     ArgParser argParser(argc, argv);
@@ -33,26 +34,28 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    std::cout << "checkpoint 2" << std::endl;
+    Module *module = IRGenerator().generate("MAIN", Program);
 
-    Module *module = IRGenerator().generate("main", Program);
-
-    std::ofstream out("out.zir");
+    std::ofstream out("main.zir");
     module->print(out);
-
-    std::cout << "IR module has been created\n" << std::endl;
 
     MachineModule *machineModule = new MachineModule(module, new Z80Backend());
 
-    std::cout << "Machine module has been created\n" << std::endl;
+    MachineModuleAnalysisManager MMAM;
+    MachineFunctionAnalysisManager MFAM;
 
-    MachinePassManager machinePassManager;
-    machinePassManager.addPass(new Z80ISel());
+    BackendPassBuilder BPB;
 
-    machinePassManager.runOnMachineModule(machineModule);
+    BPB.registerModuleAnalyses(MMAM);
+    BPB.registerFunctionAnalyses(MFAM);
 
-    std::ofstream out2("out.z80");
-    Z80AsmPrinter(out2, AsmPrinter::TEXT).emit(machineModule);
+    BPB.crossRegisterManagers(MMAM, MFAM);
 
+    std::ofstream asmFile("MAIN.8xp",
+                          std::ios_base::out | std::ios_base::binary);
+    MachineModulePassManager *MPM = BPB.buildBackendPassPipeline(
+        asmFile, AsmPrinterMode::BINARY, machineModule->getBackend());
+
+    MPM->run(machineModule, MMAM);
     return 0;
 }

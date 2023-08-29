@@ -55,7 +55,7 @@ class BCallInstruction : public Z80Instruction {
 
     void print(AsmPrinter *printer) override;
 
-    void emit(AsmPrinter *printer, const SymbolTable &symbolTable) override;
+    void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;
 
     int size() override { return 3; }
 
