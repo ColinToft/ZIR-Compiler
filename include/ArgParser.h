@@ -16,7 +16,6 @@ class ArgParser {
         }
 
         if (argc > 2) {
-            std::cout << "woah a lot of args" << std::endl;
             throw std::runtime_error("Too many arguments.");
         }
 

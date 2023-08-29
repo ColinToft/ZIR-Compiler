@@ -78,7 +78,6 @@ void Z80AsmPrinter::emit8XPHeader(uint16_t programSize,
 
 void Z80AsmPrinter::emit8XPFooter() {
     // Checksum
-    std::cout << "The checksum is " << checksum << std::endl;
     emitWord(checksum);
 }
 
