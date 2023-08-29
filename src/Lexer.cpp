@@ -1,8 +1,10 @@
-#include "lexer.h"
+#include "Lexer.h"
 
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
+
+#include "ParserException.h"
 
 void Token::print() {
     std::cout << "Token(" << static_cast<int>(type) << ", " << text << ", "
@@ -115,7 +117,7 @@ std::vector<Token> Lexer::tokenize() {
         } else {
             std::string msg = "Invalid character: ";
             msg += ch;
-            throw std::runtime_error(msg);
+            throw SyntaxException(msg);
         }
         pos++;
         col++;

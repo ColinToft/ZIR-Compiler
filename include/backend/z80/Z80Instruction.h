@@ -8,6 +8,8 @@
 #include "backend/MachineInstruction.h"
 #include "backend/z80/Z80Operand.h"
 
+#include "InternalException.h"
+
 typedef uint8_t byte;
 
 class Z80Instruction : public MachineInstruction {};
@@ -57,7 +59,7 @@ class Z80LdInstruction : public Z80Instruction {
         if (dest->isRegisterPair() && src->isImmediate()) {
             return 3;
         } else {
-            throw std::runtime_error("Unsupported ld instruction");
+            throw UnsupportedFeatureException("Unsupported ld instruction");
         }
     }
 

@@ -39,7 +39,7 @@ void Z80ISel::processReturnInstruction(ReturnInstruction *returnInstruction,
         machineBB->addInstruction(new Z80RetInstruction());
         return;
     } else {
-        throw std::runtime_error(
+        throw UnsupportedFeatureException(
             "Z80ISel::processReturnInstruction: Currently only void return "
             "types are supported.");
     }
@@ -92,7 +92,7 @@ void Z80ISel::storeValues(std::vector<Value *> values,
                 new Z80RegisterOperand(memoryLocation->getRegister()),
                 new Z80ImmediateOperand(constant->getIntValue())));
         } else {
-            throw std::runtime_error(
+            throw UnsupportedFeatureException(
                 "Z80ISel::storeValues: Currently only constant values are "
                 "supported.");
         }

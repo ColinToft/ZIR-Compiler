@@ -38,7 +38,7 @@ void Z80LdInstruction::emit(AsmPrinter *printer,
         Z80ImmediateOperand *srcImm = static_cast<Z80ImmediateOperand *>(src);
         printer->emitWord(srcImm->getValue());
     } else {
-        throw std::runtime_error("Unsupported ld instruction");
+        throw UnsupportedFeatureException("Unsupported ld instruction");
     }
 }
 

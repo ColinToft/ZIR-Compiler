@@ -7,6 +7,8 @@
 #include "backend/AsmPrinter.h"
 #include "backend/z80/Z80Register.h"
 
+#include "InternalException.h"
+
 /**
  * Represents an operand in Z80 assembly.
  */
@@ -31,7 +33,7 @@ class Z80RegisterOperand : public Z80Operand {
     bool isRegister() override { return true; }
 
     bool isRegisterPair() override {
-      switch (reg) {
+        switch (reg) {
         case AF:
         case BC:
         case DE:
@@ -39,41 +41,41 @@ class Z80RegisterOperand : public Z80Operand {
         case SP:
         case IX:
         case IY:
-          return true;
+            return true;
         default:
-          return false;
-      }
+            return false;
+        }
     }
 
     bool isImmediate() override { return false; }
 
     uint8_t getRegisterCode() {
-      switch (reg) {
+        switch (reg) {
         case A:
-          return 0x07;
+            return 0x07;
         case B:
-          return 0x00;
+            return 0x00;
         case C:
-          return 0x01;
+            return 0x01;
         case D:
-          return 0x02;
+            return 0x02;
         case E:
-          return 0x03;
+            return 0x03;
         case H:
-          return 0x04;
+            return 0x04;
         case L:
-          return 0x05;
+            return 0x05;
         case BC:
-          return 0x00;
+            return 0x00;
         case DE:
-          return 0x01;
+            return 0x01;
         case HL:
-          return 0x02;
+            return 0x02;
         case SP:
-          return 0x03;
+            return 0x03;
         default:
-          throw std::runtime_error("Unsupported register");
-      }
+            throw UnsupportedFeatureException("Unsupported register");
+        }
     }
 
     void print(AsmPrinter *printer) override {

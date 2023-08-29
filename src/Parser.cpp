@@ -31,9 +31,7 @@ ZenType *Parser::parseType() {
     Token type = tokens.at(index);
     index++;
     if (type.type != Token::Type::_Type) {
-        throw std::runtime_error("Unexpected token " + type.text + " at line " +
-                                 std::to_string(type.line) + ", column " +
-                                 std::to_string(type.col));
+        throw UnexpectedTokenException(tokens.at(index - 1), "type");
     }
 
     if (type.text == "int") {

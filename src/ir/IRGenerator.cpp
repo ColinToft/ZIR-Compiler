@@ -1,4 +1,6 @@
-#include "ir/irgenerator.h"
+#include "ir/IRGenerator.h"
+
+#include "InternalException.h"
 
 Module *IRGenerator::generate(std::string name, ProgramNode *root) {
     Module *module = new Module(name);
@@ -25,7 +27,8 @@ void IRGenerator::visitStatement(StatementNode *statement) {
     } else if (auto returnStatement = dynamic_cast<ReturnNode *>(statement)) {
         visitReturn(returnStatement);
     } else {
-        throw std::runtime_error("Unknown statement reached in IR generator");
+        throw UnsupportedFeatureException(
+            "Unknown statement reached in IR generator");
     }
 }
 
@@ -57,6 +60,6 @@ ZIRType IRGenerator::convertType(ZenType *type) {
     case ZenType::Void:
         return ZIRType(ZIRType::Void);
     default:
-        throw std::runtime_error("Unknown type");
+        throw UnsupportedFeatureException("Unknown type");
     }
 }

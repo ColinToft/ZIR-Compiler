@@ -22,7 +22,9 @@ void Z80AsmPrinter::emitProgramPrologue(MachineModule *module,
 
 void Z80AsmPrinter::emitProgramEpilogue(MachineModule *module,
                                         const SymbolTable *table) {
-    emit8XPFooter();
+    if (mode == AsmPrinterMode::BINARY) {
+        emit8XPFooter();
+    }
 }
 
 void Z80AsmPrinter::emit8XPHeader(uint16_t programSize,
@@ -37,17 +39,12 @@ void Z80AsmPrinter::emit8XPHeader(uint16_t programSize,
     // Comment (max 42 chars)
     std::string comment = "Created by Zenith Z80 Assembler";
 
-    // Add spaces to the end of the comment to make it 42 chars long
-    /*while (comment.length() < 42) {
-        comment += " ";
-    }*/
-
     emitBytes(comment, 42);
 
     // Length of the data section
     emitWord(programSize + 19 + 2); // 19 bytes of header data after this field
 
-    // all sizes are +2 for the 0xbb and 0x6d bytes
+    // All sizes are +2 for the 0xbb and 0x6d bytes
 
     // Data section
     resetChecksum();
