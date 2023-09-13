@@ -15,6 +15,12 @@
 template <typename IRUnitT> class PassManager {
 
   public:
+    ~PassManager() {
+        for (auto pass : passes) {
+            delete pass;
+        }
+    }
+
     void addPass(Pass<IRUnitT> *pass) { passes.push_back(pass); }
 
     void run(IRUnitT *IR, AnalysisManager<IRUnitT> &AM) {

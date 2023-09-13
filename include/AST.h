@@ -155,7 +155,9 @@ class FunctionCallNode : public ExpressionNode {
 class VariableNode : public ExpressionNode {
   public:
     VariableNode(std::string name) : name(name) {}
+
     ~VariableNode() {}
+
     void print(std::ostream &out, int indent) {
         out << "VariableNode(" << name << ")" << std::endl;
     }
@@ -167,7 +169,11 @@ class VariableNode : public ExpressionNode {
 class ConstantNode : public ExpressionNode {
   public:
     ConstantNode(ZenType *type, std::string value) : type(type), value(value) {}
-    ~ConstantNode() {}
+
+    ~ConstantNode() {
+        delete type;
+    }
+
     void print(std::ostream &out, int indent) {
         std::string indentStr(indent, ' ');
         out << indentStr << "ConstantNode(" << value << ")" << std::endl;

@@ -13,6 +13,8 @@
  */
 template <typename IRUnitT> class Pass {
   public:
+    virtual ~Pass() {}
+
     virtual void run(IRUnitT *IR, AnalysisManager<IRUnitT> &AM) = 0;
 };
 

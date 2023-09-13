@@ -16,7 +16,21 @@ template <typename IRUnitT> class AnalysisManager {
   public:
     AnalysisManager() {}
 
-    virtual ~AnalysisManager() {}
+    virtual ~AnalysisManager() {
+        for (auto analysisPass : analysisPasses) {
+            delete analysisPass.second;
+        }
+
+        for (auto proxy : proxyMap) {
+            delete proxy.second;
+        }
+
+        for (auto unitAnalyses : availableAnalyses) {
+            for (auto analysis : unitAnalyses.second) {
+                delete analysis.second;
+            }
+        }
+    }
 
     void registerAnalysisPass(AnalysisPass<IRUnitT> *analysisPass) {
         analysisPasses[analysisPass->getID()] = analysisPass;

@@ -11,6 +11,8 @@ class MachineFunctionToMachineModulePassAdaptor : public MachineModulePass {
     MachineFunctionToMachineModulePassAdaptor(MachineFunctionPass *pass)
         : pass(pass) {}
 
+    ~MachineFunctionToMachineModulePassAdaptor() { delete pass; }
+
     void run(MachineModule *module,
              MachineModuleAnalysisManager &MMAM) override {
         for (auto &machineFunction : module->getMachineFunctions()) {

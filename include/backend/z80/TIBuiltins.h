@@ -19,9 +19,9 @@ static std::unordered_map<std::string, uint16_t> tiCallMap = {
     {"_DispHL", 0x4507},
 };
 
-static std::unordered_map<std::string, std::vector<Z80MemoryLocation *>>
+static std::unordered_map<std::string, std::vector<Z80Register>>
     tiCallMemoryMap = {
-        {"_DispHL", {new Z80MemoryLocation(Z80Register::HL)}},
+        {"_DispHL", {Z80Register::HL}},
 };
 
 class TIBuiltins {
@@ -34,7 +34,15 @@ class TIBuiltins {
 
     static std::vector<Z80MemoryLocation *>
     getMemoryLocationsForBCall(std::string label) {
-        return tiCallMemoryMap[label];
+        std::vector<Z80MemoryLocation *> memoryLocations;
+
+        if (tiCallMemoryMap.find(label) != tiCallMemoryMap.end()) {
+            for (Z80Register reg : tiCallMemoryMap[label]) {
+                memoryLocations.push_back(new Z80MemoryLocation(reg));
+            }
+        }
+
+        return memoryLocations;
     }
 
     static std::string getBuiltinName(std::string functionName) {

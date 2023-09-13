@@ -15,6 +15,12 @@ class MachineFunction {
   public:
     MachineFunction(Function *function) : function(function) {}
 
+    ~MachineFunction() {
+        for (auto machineBasicBlock : machineBasicBlocks) {
+            delete machineBasicBlock;
+        }
+    }
+
     void addMachineBasicBlock(MachineBasicBlock *machineBasicBlock) {
         machineBasicBlocks.push_back(machineBasicBlock);
     }

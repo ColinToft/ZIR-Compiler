@@ -12,6 +12,8 @@
  */
 template <typename IRUnitT> class AnalysisPass {
   public:
+    virtual ~AnalysisPass() {}
+
     virtual Analysis *run(IRUnitT *IR) = 0;
 
     virtual AnalysisID getID() = 0;

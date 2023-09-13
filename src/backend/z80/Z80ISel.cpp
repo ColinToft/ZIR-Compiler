@@ -26,9 +26,15 @@ void Z80ISel::processCallInstruction(CallInstruction *callInstruction,
                     machineBB);
         machineBB->addInstruction(new BCallInstruction(bcallName));
 
+        for (Z80MemoryLocation *memoryLocation : memoryLocations) {
+            delete memoryLocation;
+        }
+
     } else {
         // We have a normal function call
-        // TODO
+        throw UnsupportedFeatureException(
+            "Z80ISel::processCallInstruction: Currently only TI builtin "
+            "functions are supported.");
     }
 }
 

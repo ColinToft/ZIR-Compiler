@@ -16,6 +16,12 @@ class Function {
     Function(ZIRType returnType, std::string name)
         : returnType(returnType), name(name) {}
 
+    ~Function() {
+        for (auto basicBlock : basicBlocks) {
+            delete basicBlock;
+        }
+    }
+
     void addBasicBlock(BasicBlock *basicBlock) {
         basicBlocks.push_back(basicBlock);
     }

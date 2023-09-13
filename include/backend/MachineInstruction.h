@@ -13,6 +13,8 @@ class AsmPrinter;
  */
 class MachineInstruction {
   public:
+    virtual ~MachineInstruction() {}
+
     virtual void print(AsmPrinter *printer) = 0;
 
     virtual void emit(AsmPrinter *printer, const SymbolTable *symbolTable) = 0;

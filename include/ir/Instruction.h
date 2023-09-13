@@ -34,6 +34,12 @@ class CallInstruction : public Instruction {
     CallInstruction(std::string name, std::vector<Value *> arguments)
         : Instruction(CALL), name(name), arguments(arguments) {}
 
+    ~CallInstruction() {
+        for (auto argument : arguments) {
+            delete argument;
+        }
+    }
+
     void print(std::ostream &out);
 
     std::string getName() { return name; }
@@ -52,6 +58,8 @@ class BranchInstruction : public Instruction {
         : Instruction(BRANCH), condition(condition), trueBlock(trueBlock),
           falseBlock(falseBlock) {}
 
+    ~BranchInstruction() { delete condition; }
+
     void print(std::ostream &out);
 
   private:
@@ -63,6 +71,8 @@ class BranchInstruction : public Instruction {
 class ReturnInstruction : public Instruction {
   public:
     ReturnInstruction(Value *value) : Instruction(RETURN), value(value) {}
+
+    ~ReturnInstruction() { delete value; }
 
     void print(std::ostream &out);
 

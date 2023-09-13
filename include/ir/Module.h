@@ -14,6 +14,12 @@ class Module {
   public:
     Module(std::string name) : name(name) {}
 
+    ~Module() {
+        for (auto function : functions) {
+            delete function;
+        }
+    }
+
     void addFunction(Function *function) { functions.push_back(function); }
 
     void print(std::ostream &out) {

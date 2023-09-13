@@ -33,12 +33,8 @@ int main(int argc, char const *argv[]) {
 
     FileHandler fileHandler;
 
-    std::cout << "Reading file " << filename << std::endl;
     Lexer lexer(fileHandler.readFile(filename));
     std::vector<Token> tokens = lexer.tokenize();
-    for (Token token : tokens) {
-        token.print();
-    }
     Parser parser(tokens);
 
     ProgramNode *Program;
@@ -58,7 +54,8 @@ int main(int argc, char const *argv[]) {
         return 0;
     }
 
-    MachineModule *machineModule = new MachineModule(module, new Z80Backend());
+    Backend *backend = new Z80Backend();
+    MachineModule *machineModule = new MachineModule(module, backend);
 
     MachineModuleAnalysisManager MMAM;
     MachineFunctionAnalysisManager MFAM;
@@ -76,5 +73,12 @@ int main(int argc, char const *argv[]) {
         BPB.buildBackendPassPipeline(out, mode, machineModule->getBackend());
 
     MPM->run(machineModule, MMAM);
+
+    delete MPM;
+    delete machineModule;
+    delete module;
+    delete Program;
+    delete backend;
+
     return 0;
 }

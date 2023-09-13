@@ -51,6 +51,11 @@ class Z80LdInstruction : public Z80Instruction {
     Z80LdInstruction(Z80Operand *dest, Z80Operand *src)
         : dest(dest), src(src) {}
 
+    ~Z80LdInstruction() {
+        delete dest;
+        delete src;
+    }
+
     void print(AsmPrinter *printer) override;
 
     void emit(AsmPrinter *printer, const SymbolTable *symbolTable) override;

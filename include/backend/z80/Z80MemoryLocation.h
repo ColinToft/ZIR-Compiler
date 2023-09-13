@@ -7,8 +7,8 @@
 // A memory location can be either a register or a stack offset.
 class Z80MemoryLocation {
   public:
-    Z80MemoryLocation(Z80Register reg) : reg(reg) {}
-    Z80MemoryLocation(int offset) : offset(offset) {}
+    Z80MemoryLocation(Z80Register reg) : reg(reg), isReg(true) {}
+    Z80MemoryLocation(int offset) : offset(offset), isReg(false) {}
 
     bool isRegister() { return isReg; }
     bool isOffset() { return !isReg; }

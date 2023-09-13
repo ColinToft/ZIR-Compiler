@@ -14,6 +14,12 @@ class BasicBlock {
   public:
     BasicBlock(std::string name) : name(name) {}
 
+    ~BasicBlock() {
+        for (auto instruction : instructions) {
+            delete instruction;
+        }
+    }
+
     void addInstruction(Instruction *instruction) {
         instructions.push_back(instruction);
     }

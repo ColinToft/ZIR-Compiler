@@ -20,6 +20,12 @@ class MachineModule {
         }
     }
 
+    ~MachineModule() {
+        for (auto machineFunction : machineFunctions) {
+            delete machineFunction;
+        }
+    }
+
     void addMachineFunction(MachineFunction *machineFunction) {
         machineFunctions.push_back(machineFunction);
     }

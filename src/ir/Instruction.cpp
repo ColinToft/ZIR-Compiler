@@ -1,5 +1,5 @@
-#include "ir/instruction.h"
-#include "ir/basicblock.h"
+#include "ir/Instruction.h"
+#include "ir/BasicBlock.h"
 
 #include <iostream>
 #include <string>

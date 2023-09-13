@@ -19,6 +19,12 @@ class MachineBasicBlock {
     MachineBasicBlock(std::string name, MachineFunction *parent)
         : name(name), parent(parent) {}
 
+    ~MachineBasicBlock() {
+        for (auto machineInstruction : machineInstructions) {
+            delete machineInstruction;
+        }
+    }
+
     void addInstruction(MachineInstruction *machineInstruction) {
         machineInstructions.push_back(machineInstruction);
     }

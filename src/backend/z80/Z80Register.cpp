@@ -1,4 +1,4 @@
-#include "backend/z80/z80register.h"
+#include "backend/z80/Z80Register.h"
 
 std::string getRegisterName(Z80Register reg) {
     switch (reg) {

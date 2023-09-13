@@ -14,6 +14,8 @@
  */
 class Z80Operand {
   public:
+    virtual ~Z80Operand() {}
+
     virtual void print(AsmPrinter *printer) = 0;
 
     virtual bool isRegisterPair() = 0;
