@@ -1,6 +1,0 @@
-void main() {
-    clrLCDFull()
-    print(1 + 5)
-    getKey()
-    clrLCDFull()
-}

@@ -1,5 +1,0 @@
-int main() {
-    int score = 0xfc23
-    print(score)
-    getKey()
-}
